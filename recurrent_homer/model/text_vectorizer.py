@@ -6,10 +6,17 @@ import tensorflow as tf
 from pathlib import Path
 import numpy as np
 
+
 class TextVectorizer:
     """Text vectorization class that converts text into vectors if numeric
     ids based on a vocabulary, and vice-versa. Vocabulary is generated
     based on text corpus provided when initializing the class.
+
+    Args:
+        text_corpus (str, optional): Text corpus used to generate vocabulary.
+            Defaults to None.
+        vocabulary_path (Path, optional): Path to previously saved vocabulary.
+            Defaults to None.
     """
 
     test_sequence: list = ["a", "f", "r", "i", "y"]
