@@ -1,5 +1,6 @@
 """`train_wiki` implementation module."""
 
+import json
 import logging
 from pathlib import Path
 
@@ -9,8 +10,7 @@ import tensorflow as tf
 from recurrent_homer.constants import DATA_PATH, WIKI_DATASET_PATH, WIKI_MODEL_PATH
 from recurrent_homer.jobs import train_recurrent_model
 from recurrent_homer.model.text_vectorizer import TextVectorizer
-
-from .utils import load_train_val_dataset, process_model_history
+from recurrent_homer.utils import load_train_val_dataset, process_model_history
 
 logger = logging.getLogger(__name__)
 
@@ -86,7 +86,32 @@ def train_wiki(
     logger.info(f"Validation loss: {wiki_val_loss}")
 
     logger.info("Saving wiki model...")
-    wiki_recurrent_model.save_weights(WIKI_MODEL_PATH)
+    wiki_recurrent_model.save_weights(WIKI_MODEL_PATH / "model")
+    _save_model_params(embedding_dim, rnn_units, n_gru_layers, dropout)
+
+
+def _save_model_params(embedding_dim: int, rnn_units: int, n_gru_layers: int, dropout: float):
+    """
+    Save the model parameters to a JSON file.
+
+    Parameters:
+        embedding_dim (int): The dimension of the embedding.
+        rnn_units (int): The number of units in the RNN.
+        n_gru_layers (int): The number of GRU layers.
+        dropout (float): The dropout rate.
+
+    Returns:
+        None
+    """
+    model_params = {
+        "embedding_dim": embedding_dim,
+        "rnn_units": rnn_units,
+        "n_gru_layers": n_gru_layers,
+        "dropout": dropout,
+    }
+    model_params_path = WIKI_MODEL_PATH / "model_params.json"
+    with open(model_params_path, "w") as f:
+        json.dump(model_params, f)
 
 
 if __name__ == "__main__":

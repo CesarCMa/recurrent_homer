@@ -2,11 +2,12 @@
 
 import logging
 import os
+from pathlib import Path
 from typing import Any
 
 import tensorflow as tf
 
-from recurrent_homer.constants import LR_SCHEDULER_STEP
+from recurrent_homer.constants import DATA_PATH, LR_SCHEDULER_STEP_WIKI
 from recurrent_homer.model.recurrent_model import RecurrentModel
 from recurrent_homer.model.text_vectorizer import TextVectorizer
 
@@ -24,7 +25,7 @@ def train_recurrent_model(
     dropout: float,
     batch_size: int,
     learning_rate: float = 0.001,
-    checkpoint_dir: str = "data/training_checkpoints",
+    checkpoint_dir: Path = DATA_PATH / "training_checkpoints",
 ):
     vocab_size = len(text_vectorizer.ids_from_chars.get_vocabulary())
     recurrent_model = _init_model(
@@ -153,7 +154,7 @@ def _learning_rate_scheduler(epoch: int, lr: float) -> float:
     Returns:
         float: New learning rate.
     """
-    if epoch < LR_SCHEDULER_STEP:
+    if epoch < LR_SCHEDULER_STEP_WIKI:
         return lr
     else:
         return lr * tf.math.exp(-0.1)
