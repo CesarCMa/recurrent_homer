@@ -1,4 +1,4 @@
-"""`train` implementation module."""
+"""`train_wiki` implementation module."""
 
 import logging
 from pathlib import Path
@@ -9,6 +9,8 @@ import tensorflow as tf
 from recurrent_homer.constants import DATA_PATH, WIKI_DATASET_PATH, WIKI_MODEL_PATH
 from recurrent_homer.jobs import train_recurrent_model
 from recurrent_homer.model.text_vectorizer import TextVectorizer
+
+from .utils import load_train_val_dataset, process_model_history
 
 logger = logging.getLogger(__name__)
 
@@ -62,7 +64,7 @@ def train_wiki(
     logging.basicConfig(level=logging.INFO)
 
     logger.info("Loading train and validation sets...")
-    wiki_train_set, wiki_val_set = _load_train_val_dataset(WIKI_DATASET_PATH)
+    wiki_train_set, wiki_val_set = load_train_val_dataset(WIKI_DATASET_PATH)
 
     logger.info("Loading Vocabulary...")
     text_vectorizer = TextVectorizer(vocabulary_path=DATA_PATH / "vocabulary.pkl")
@@ -80,42 +82,11 @@ def train_wiki(
         batch_size,
     )
 
-    logger.info(f"History of wiki model: {_process_model_history(wiki_history)}")
+    logger.info(f"History of wiki model: {process_model_history(wiki_history)}")
     logger.info(f"Validation loss: {wiki_val_loss}")
 
     logger.info("Saving wiki model...")
     wiki_recurrent_model.save_weights(WIKI_MODEL_PATH)
-
-
-def _load_train_val_dataset(path: Path) -> tuple:
-    """Load train and validation sets.
-
-    Args:
-        path (Path): Path to train and validation sets.
-
-    Returns:
-        tuple: Train and validation sets.
-    """
-    train_set = tf.data.Dataset.load(str(path / "train"))
-    logger.info(f"Train set cardinality: {train_set.cardinality()}")
-    validation = tf.data.Dataset.load(str(path / "validation"))
-    logger.info(f"Validation set cardinality: {validation.cardinality()}")
-    return train_set, validation
-
-
-def _process_model_history(history: tf.keras.callbacks.History) -> dict:
-    """Process model history.
-
-    Args:
-        history (tf.keras.callbacks.History): History of the model.
-
-    Returns:
-        dict: Dictionary with the history of the model.
-    """
-    return {
-        "loss": history.history["loss"],
-        "learning_rate": history.history["lr"],
-    }
 
 
 if __name__ == "__main__":
