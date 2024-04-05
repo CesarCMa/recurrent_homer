@@ -37,7 +37,7 @@ logger = logging.getLogger(__name__)
     default=64,
     help="Batch size used during dataset creation.",
 )
-def train(
+def train_wiki(
     epochs: int,
     embedding_dim: int,
     rnn_units: int,
@@ -45,7 +45,20 @@ def train(
     dropout: float,
     batch_size: int,
 ):
-    """Train model."""
+    """Train a recurrent model on `wikipedia` dataset. Module can be executed via CLI with command
+    `python3 recurrent_homer.train_wiki.py --arg value`.
+
+    Args:
+        epochs (int): Number of epochs to train the model.
+        embedding_dim (int): Embedding dimension for the first layer of the model.
+        rnn_units (int): Numer of recurrent units for the biggest layer of the model.
+        n_gru_layers (int): Number of GRU layers to use in the model.
+        dropout (float): Dropout rate to use in the model.
+        batch_size (int): Batch size used during dataset creation.
+
+    Returns:
+        None
+    """
     logging.basicConfig(level=logging.INFO)
 
     logger.info("Loading train and validation sets...")
@@ -106,4 +119,4 @@ def _process_model_history(history: tf.keras.callbacks.History) -> dict:
 
 
 if __name__ == "__main__":
-    train()
+    train_wiki()
