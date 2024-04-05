@@ -67,7 +67,7 @@ def train(
         batch_size,
     )
 
-    logger.info(f"History of wiki model: {wiki_history}")
+    logger.info(f"History of wiki model: {_process_model_history(wiki_history)}")
     logger.info(f"Validation loss: {wiki_val_loss}")
 
     logger.info("Saving wiki model...")
@@ -88,6 +88,21 @@ def _load_train_val_dataset(path: Path) -> tuple:
     validation = tf.data.Dataset.load(str(path / "validation"))
     logger.info(f"Validation set cardinality: {validation.cardinality()}")
     return train_set, validation
+
+
+def _process_model_history(history: tf.keras.callbacks.History) -> dict:
+    """Process model history.
+
+    Args:
+        history (tf.keras.callbacks.History): History of the model.
+
+    Returns:
+        dict: Dictionary with the history of the model.
+    """
+    return {
+        "loss": history.history["loss"],
+        "learning_rate": history.history["lr"],
+    }
 
 
 if __name__ == "__main__":
