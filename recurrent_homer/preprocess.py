@@ -5,7 +5,7 @@ import logging
 import click
 
 from recurrent_homer import jobs
-from recurrent_homer.constants import DATA_PATH, WIKI_DATASET_PATH
+from recurrent_homer.constants import DATA_PATH, HOMER_DATASET_PATH, WIKI_DATASET_PATH
 
 logger = logging.getLogger(__name__)
 
@@ -50,9 +50,19 @@ def preprocess(
     wiki_train, wiki_val, wiki_test, text_vectorizer = jobs.preprocess_wiki_dataset(
         val_test_proportions, wiki_amount_samples, batch_size
     )
+
+    logger.info("Preprocessing Homer dataset")
+    homer_train, homer_val, homer_test = jobs.preprocess_homer_dataset(
+        text_vectorizer, val_test_proportions, batch_size
+    )
+
+    logger.info("Saving datasets")
     wiki_train.save(str(WIKI_DATASET_PATH / "train"))
     wiki_val.save(str(WIKI_DATASET_PATH / "validation"))
     wiki_test.save(str(WIKI_DATASET_PATH / "test"))
+    homer_train.save(str(HOMER_DATASET_PATH / "train"))
+    homer_val.save(str(HOMER_DATASET_PATH / "validation"))
+    homer_test.save(str(HOMER_DATASET_PATH / "test"))
     text_vectorizer.save_vocabulary(DATA_PATH)
 
 
