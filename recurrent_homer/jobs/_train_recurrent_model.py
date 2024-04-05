@@ -1,17 +1,19 @@
-"""`train_wiki_model` module."""
+"""`train_recurrent_model` module."""
 
 import logging
 import os
+from typing import Any
 
 import tensorflow as tf
 
+from recurrent_homer.constants import LR_SCHEDULER_STEP
 from recurrent_homer.model.recurrent_model import RecurrentModel
 from recurrent_homer.model.text_vectorizer import TextVectorizer
 
 logger = logging.getLogger(__name__)
 
 
-def train_wiki_model(
+def train_recurrent_model(
     train: tf.data.Dataset,
     validation: tf.data.Dataset,
     text_vectorizer: TextVectorizer,
@@ -21,6 +23,7 @@ def train_wiki_model(
     n_gru_layers: int,
     dropout: float,
     batch_size: int,
+    learning_rate: float = 0.001,
     checkpoint_dir: str = "data/training_checkpoints",
 ):
     vocab_size = len(text_vectorizer.ids_from_chars.get_vocabulary())
@@ -31,6 +34,7 @@ def train_wiki_model(
         rnn_units=rnn_units,
         n_gru_layers=n_gru_layers,
         dropout=dropout,
+        learning_rate=learning_rate,
     )
 
     checkpoint_prefix = os.path.join(checkpoint_dir, "ckpt_{epoch}")
@@ -38,7 +42,7 @@ def train_wiki_model(
         filepath=checkpoint_prefix, save_weights_only=True
     )
     early_stop_callback = tf.keras.callbacks.EarlyStopping(monitor="loss", patience=3)
-    lr_scheduler_callback = tf.keras.callbacks.LearningRateScheduler(learning_rate_scheduler)
+    lr_scheduler_callback = tf.keras.callbacks.LearningRateScheduler(_learning_rate_scheduler)
 
     history = recurrent_model.fit(
         train,
@@ -60,6 +64,7 @@ def _init_model(
     rnn_units: int,
     n_gru_layers: int,
     dropout: float,
+    learning_rate: float,
 ) -> RecurrentModel:
     """Create an instance of `RecurrentModel` and ensure it is correctly
     initialized.
@@ -76,6 +81,7 @@ def _init_model(
         rnn_units (int): RNN units.
         n_gru_layers (int): Number of GRU layers.
         dropout (float): Dropout rate.
+        learning_rate (float, optional): Learning rate for the optimizer.
 
     Returns:
         RecurrentModel: Model instance.
@@ -104,7 +110,9 @@ def _init_model(
         exp_init_loss,
         recurrent_model,
     )
-    recurrent_model.compile(optimizer="adam", loss=loss)
+    recurrent_model.compile(
+        optimizer=tf.keras.optimizers.Adam(learning_rate=learning_rate), loss=loss
+    )
     return recurrent_model
 
 
@@ -135,7 +143,7 @@ def _log_model_info(
     recurrent_model.summary()
 
 
-def learning_rate_scheduler(epoch: int, lr: float) -> float:
+def _learning_rate_scheduler(epoch: int, lr: float) -> float:
     """Learning rate scheduler.
 
     Args:
@@ -145,7 +153,7 @@ def learning_rate_scheduler(epoch: int, lr: float) -> float:
     Returns:
         float: New learning rate.
     """
-    if epoch < 5:
+    if epoch < LR_SCHEDULER_STEP:
         return lr
     else:
         return lr * tf.math.exp(-0.1)

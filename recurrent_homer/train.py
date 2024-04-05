@@ -7,7 +7,7 @@ import click
 import tensorflow as tf
 
 from recurrent_homer.constants import DATA_PATH, WIKI_DATASET_PATH, WIKI_MODEL_PATH
-from recurrent_homer.jobs import train_wiki_model
+from recurrent_homer.jobs import train_recurrent_model
 from recurrent_homer.model.text_vectorizer import TextVectorizer
 
 logger = logging.getLogger(__name__)
@@ -55,7 +55,7 @@ def train(
     text_vectorizer = TextVectorizer(vocabulary_path=DATA_PATH / "vocabulary.pkl")
 
     logger.info("Training model...")
-    wiki_recurrent_model, wiki_history, wiki_val_loss = train_wiki_model(
+    wiki_recurrent_model, wiki_history, wiki_val_loss = train_recurrent_model(
         wiki_train_set,
         wiki_val_set,
         text_vectorizer,
