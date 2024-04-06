@@ -40,11 +40,11 @@ def process_model_history(history: tf.keras.callbacks.History) -> dict:
     }
 
 
-def load_model_params() -> dict:
+def load_model_params(model_path: Path) -> dict:
     """
     Load model parameters from a JSON file and return them as a dictionary.
     """
-    with open(WIKI_MODEL_PATH / "model_params.json", "r") as file:
+    with open(model_path / "model_params.json", "r") as file:
         model_params = json.load(file)
     return model_params
 

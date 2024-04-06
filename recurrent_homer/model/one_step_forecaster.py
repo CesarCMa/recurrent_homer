@@ -1,6 +1,7 @@
 """`OneStepForecaster` implementation module."""
 
 import tensorflow as tf
+
 from recurrent_homer.model.text_vectorizer import TextVectorizer
 
 
@@ -15,15 +16,22 @@ class OneStep(tf.keras.Model):
 
     @tf.function
     def generate_one_step(self, inputs, states=None):
-        # Convert strings to token IDs.
+        """
+        A function that generates the next step (word) based on the input characters and
+        model states.
+
+        Args:
+            inputs: The input characters to generate the next step from.
+            states: The model states to consider during generation.
+
+        Returns:
+            predicted_chars: The predicted characters for the next step.
+            states: The updated model states.
+        """
         input_chars = tf.strings.unicode_split(inputs, "UTF-8")
         input_ids = self.ids_from_chars(input_chars).to_tensor()
 
-        # Run the model.
-        # predicted_logits.shape is [batch, char, next_char_logits]
-        predicted_logits, states = self.model(
-            inputs=input_ids, states=states, return_state=True
-        )
+        predicted_logits, states = self.model(inputs=input_ids, states=states, return_state=True)
         # Only use the last prediction.
         predicted_logits = predicted_logits[:, -1, :]
         predicted_logits = predicted_logits / self.temperature
@@ -34,10 +42,8 @@ class OneStep(tf.keras.Model):
         predicted_ids = tf.random.categorical(predicted_logits, num_samples=1)
         predicted_ids = tf.squeeze(predicted_ids, axis=-1)
 
-        # Convert from token ids to characters
         predicted_chars = self.chars_from_ids(predicted_ids)
 
-        # Return the characters and model state.
         return predicted_chars, states
 
     def _create_unknown_token_mask(self):

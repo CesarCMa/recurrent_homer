@@ -1,5 +1,6 @@
 """`train_homer` module. """
 
+import json
 import logging
 
 import click
@@ -14,10 +15,10 @@ from recurrent_homer.jobs import fine_tune_homer
 from recurrent_homer.model.recurrent_model import RecurrentModel
 from recurrent_homer.model.text_vectorizer import TextVectorizer
 from recurrent_homer.utils import (
+    get_input_shape,
+    load_model_params,
     load_train_val_dataset,
     process_model_history,
-    load_model_params,
-    get_input_shape,
 )
 
 logger = logging.getLogger(__name__)
@@ -41,7 +42,7 @@ def fine_tune(epochs: int, learning_rate: float):
 
     logger.info("Loading Vocabulary and Wiki model...")
     input_shape = get_input_shape(homer_train)
-    wiki_model, text_vectorizer = _load_components(input_shape)
+    wiki_model, model_params = _load_components(input_shape)
 
     logger.info("Fine-tuning model...")
     homer_model, history, val_loss = fine_tune_homer(
@@ -57,6 +58,7 @@ def fine_tune(epochs: int, learning_rate: float):
 
     logger.info("Saving fine-tuned model...")
     homer_model.save_weights(HOMER_MODEL_PATH / "model")
+    _save_model_params(model_params, input_shape)
 
 
 def _load_components(input_shape: list) -> tuple:
@@ -70,7 +72,7 @@ def _load_components(input_shape: list) -> tuple:
     """
     text_vectorizer = TextVectorizer(vocabulary_path=DATA_PATH / "vocabulary.pkl")
 
-    model_params = load_model_params()
+    model_params = load_model_params(WIKI_MODEL_PATH)
     logger.info(f"Loaded model parameters: {model_params}")
 
     model = RecurrentModel(
@@ -84,7 +86,24 @@ def _load_components(input_shape: list) -> tuple:
     logger.info(f"Building model with input shape: {input_shape}")
     model.build(input_shape=(input_shape[0], input_shape[1]))
     model.load_weights(WIKI_MODEL_PATH / "model")
-    return model, text_vectorizer
+    return model, model_params
+
+
+def _save_model_params(model_params: dict, input_shape: list) -> None:
+    """
+    Save the model parameters to a JSON file.
+
+    Parameters:
+        model_params (dict): The model parameters.
+        input_shape (list): The input shape of the model.
+
+    Returns:
+        None
+    """
+    model_params["input_shape"] = input_shape
+    model_params_path = HOMER_MODEL_PATH / "model_params.json"
+    with open(model_params_path, "w") as f:
+        json.dump(model_params, f)
 
 
 if __name__ == "__main__":
