@@ -76,5 +76,5 @@ def _load_components() -> tuple:
     input_shape = model_params["input_shape"]
     logger.info(f"Building model with input shape: {input_shape}")
     model.build(input_shape=(input_shape[0], input_shape[1]))
-    model.load_weights(APP_MODEL_PATH / "wiki_model")
+    model.load_weights(APP_MODEL_PATH / "model")
     return model, text_vectorizer
