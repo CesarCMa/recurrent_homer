@@ -11,11 +11,11 @@ def app():
 
     render_header()
     with st.form("promp_submit_form", border=False):
-        user_prompt = render_prompt_input()
+        user_prompt, temperature, length_response = render_prompt_input()
         submitted = st.form_submit_button("Send prompt ⬆️")
         if submitted:
             with st.status("Generating response... 💭", expanded=True):
-                inference_job = InferenceJob(100)
+                inference_job = InferenceJob(length_response, temperature)
                 model_output = inference_job.generate_response(user_prompt)
                 st.write(model_output)
         else:
@@ -24,7 +24,16 @@ def app():
 
 def render_prompt_input() -> str:
     user_prompt = st.text_input(" ", placeholder="Provide your prompt here 👇️")
-    return user_prompt
+    temperature = st.select_slider(
+        "Select temperature of the model",
+        options=[temp / 10 for temp in range(1, 20, 1)],
+    )
+    length_response = st.slider(
+        "Select length of the response",
+        min_value=1,
+        max_value=300,
+    )
+    return user_prompt, temperature, length_response
 
 
 def _render_prompt_instructions():

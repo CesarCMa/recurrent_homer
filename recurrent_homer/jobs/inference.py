@@ -15,11 +15,23 @@ logger = logging.getLogger(__name__)
 
 
 class InferenceJob:
+    """Inference Job."""
 
-    def __init__(self, len_response: int) -> None:
+    def __init__(self, len_response: int, temperature: float) -> None:
+        """Initialize Inference Job.
+
+        Args:
+            len_response (int): Length of response.
+            temperature (float): Temperature of the model, lower values generates more conservative
+                responses.
+
+        Returns:
+            None
+        """
         self.len_response = len_response
+        self.temperature = temperature
         self.recurrent_model, self.text_vectorizer = _load_components()
-        self.one_step_model = OneStep(self.recurrent_model, self.text_vectorizer)
+        self.one_step_model = OneStep(self.recurrent_model, self.text_vectorizer, self.temperature)
 
     def generate_response(self, prompt: str):
         """Generate response with pretrained `RecurrentModel` instance.
