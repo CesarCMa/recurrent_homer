@@ -11,3 +11,11 @@ DOC_PATH = Path("docs")
 # Modelling constants
 LR_SCHEDULER_STEP_WIKI = 5
 LR_SCHEDULER_STEP_FINE_TUNE = 1
+
+# App styling
+COLOR_PALETTE = {
+    "ebony": "#5f634f",
+    "light_blue": "#9bc4cb",
+    "mint_green": "#cfebdf",
+    "tea_green": "#dbefbc",
+}
