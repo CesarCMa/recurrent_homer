@@ -27,6 +27,7 @@ If you want to test out the Streamlit app follow these steps:
 
 After this steps you should be able to open the app in your browser on the localhost provided by streamlit.
 
+> 💡Tip: if you are using conda environments you can use the `project_setup.sh` script within `/scripts` directory to easily setup the environment.
 
 ## Training of the models
 
