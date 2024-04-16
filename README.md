@@ -8,51 +8,12 @@ The results are far away from impressive but, as this was my first contact with 
 
 The model is served on a Streamlit app that lets us provide a prompt and regulate the temperature (how conservative the model should behave) and length of the output.
 
-<div style="align: left; text-align:center;">
+<div style="align: center; text-align:center;">
   <img src="https://github.com/CesarCMa/recurrent_homer/blob/main/recurrent_homer/img/land_page_app.png"/>
-  <figcaption>Figure 1: Streamlit app.</figcaption>
-</div>
-
-## Modelling approach
-
-<div style="align: left; text-align:center;">
-  <img src="https://github.com/CesarCMa/recurrent_homer/blob/main/recurrent_homer/img/modelling_diagram.png"/>
-  <figcaption>Figure 2: Overview of the modelling approach. </figcaption>
 </div>
 
 
-As you may see on the diagram, the training of the model involves two different data sources and two steps of training, lets describe it with a bit more of detail.
-
-### Data Sources
-
-The model was trained on subsets of two main sources:
-
-* [Wikipedia dataset](https://huggingface.co/datasets/wikipedia) from HuggingFace
-* [Dialogue Lines of The Simpsons](https://www.kaggle.com/datasets/pierremegret/dialogue-lines-of-the-simpsons) from Kaggle.
-
-
-
-In the case of the Wikipedia dataset, we extract a total of 8000 samples from the original dataset, put them all together on a text corpus, and **generate sequences of 100 characters** from it.
-
-For the Dialogue Lines we extracted the samples of the dataframe where the column *raw_character_text* was equal to *Homer Simpson*, then followed the same logic as with the wiki dataset, create a corpus and generate sequences of 100 characters.
-
-### Preprocess
-
-One of the key steps to build a text generation model is the **Vectorization of the text**, this is, the process of converting text into a numerical representation that our Deep Learning models can understand.
-
-Also, we have to take into account that our main objective is to create a model that generates text, so we need to provide pairs of $(x,y)$ to achieve so.
-
-The steps to create such pairs of samples, and to vectorize the text is the following:
-
-1. Take our text corpus and create a vocabulary (set of unique characters on the corpus). In our case, because the wikipedia dataset is the largest, we have build the vocabulary baset on it.
-2. Create a `TextVectorizer` with this vocabulary, which consist of a mapper that assigns a numerical value to each character on our vocabulary.
-3. Convert all our corpus to numerical values using our `TextVectorizer`.
-4. Generate pairs of sequences of 100 characters (our $(x,y)$ pairs for the model), where each pair consist of a given sequence of text and the same sequence moved one character forward (Figure 4).
-
-<div style="align: left; text-align:center;">
-  <img src="https://github.com/CesarCMa/recurrent_homer/blob/main/recurrent_homer/img/preprocess_diagram.png"/>
-  <figcaption>Figure 3: Overview of the preprocessing. </figcaption>
-</div>
+You can check the details about how the model was build and train on the [modelling approach documentation](https://github.com/CesarCMa/recurrent_homer/blob/main/docs/modelling_approach.md)
 
 ## Setup Of the Streamlit app
 
@@ -69,5 +30,7 @@ After this steps you should be able to open the app in your browser on the local
 
 ## Training of the models
 
-If you want to train you own models there are scripts fore preprocessing the data and training the models.
+If you want to train you own models you can run the preprocess and train scripts on the following order: `preprocess -> train_wiki -> fine_tune_homer`.
+
+All of them use [click](https://click.palletsprojects.com/en/8.1.x/) to enable easy cli execution. To get more details on which parameters you can provide to each one of them type `python recurrent_homer/name_script.py --help` on your terminal.
 
