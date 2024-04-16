@@ -13,8 +13,10 @@ The model is served on a Streamlit app that lets us provide a prompt and regulat
 
 ## Modelling approach
 
-
-<img src="https://github.com/CesarCMa/recurrent_homer/blob/main/recurrent_homer/img/modelling_diagram.png"/></a>
+<figure>
+  <img src="https://github.com/CesarCMa/recurrent_homer/blob/main/recurrent_homer/img/modelling_diagram.png"/>
+  <figcaption>Figure 2: Overview of the modelling approach. </figcaption>
+</figure>
 
 As you may see on the diagram, the training of the model involves two different data sources and two steps of training, lets describe it with a bit more of detail.
 
