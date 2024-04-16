@@ -5,3 +5,6 @@ __pycache__/
 # Data dir content
 data/*
 !data/.gitkeep
+
+# Log files
+*.log
